@@ -5,12 +5,12 @@
 #include <stdexcept>
 
 
-constexpr size_t EXCEPTION_STR_SIZE = 100U;
+constexpr size_t EXCEPTION_STR_SIZE = 150U;
 extern char explanation_str[EXCEPTION_STR_SIZE];
 
 
 #ifndef NDEBUG
-#define CHECK(contract, format, ...)         \
+#define ASSERT(contract, format, ...)         \
     do {                                               \
         if (!(contract)) {                             \
             snprintf(                                  \
