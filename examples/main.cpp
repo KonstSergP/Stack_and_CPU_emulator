@@ -1,12 +1,12 @@
 #include <iostream>
 #include <stdlib.h>
 
-
+#include "../src/emulator/parser.hpp"
 
 int main()
 {
 
-    std::cout << "Hello! It is main.cpp. " << "\n";
+    Parser parser;
 
 	return 0;
 }

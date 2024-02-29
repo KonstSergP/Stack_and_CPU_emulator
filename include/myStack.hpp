@@ -71,7 +71,7 @@ namespace handMadeStack
 	template <typename Data_t>
 	myStack<Data_t>::myStack(size_t size):
         data_ (new Data_t[size]),
-        size_ (size),
+        size_ (0),
         capacity_ (size)
 	{
         if (capacity_ == 0) {delete[] data_; data_ = nullptr;}
@@ -226,7 +226,7 @@ namespace handMadeStack
             this->resize(capacity_*2 + 1);
         }
 
-        data_[size_ - 1] = element;
+        data_[size_] = element;
         size_++;
 
         ASSERT(this->good(), "Unable to push element\n");
@@ -243,7 +243,7 @@ namespace handMadeStack
             this->resize(capacity_*2 + 1);
         }
 
-        data_[size_ - 1] = element;
+        data_[size_] = element;
         size_++;
 
         ASSERT(this->good(), "Unable to push element\n");
@@ -322,7 +322,6 @@ namespace handMadeStack
 
 /*
 1) PUSH & and PUSH &&
-2)must fall when pop empty?
 1)push back
 2)pop back
 */

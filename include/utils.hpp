@@ -23,6 +23,6 @@ extern char explanation_str[EXCEPTION_STR_SIZE];
         }                                              \
     } while (0)
 #else
-#define VERIFY_CONTRACT(contract, format, ...) \
+#define ASSERT(contract, format, ...) \
     do {} while (0)
 #endif // NDEBUG

@@ -1,0 +1,35 @@
+
+
+<space_seq> ::= "[ \t]+"
+<newline_seq> ::= "\n+"
+value ::= "(\+|-)?[1-9][0-9]*"
+
+<reg_name> ::= "AX"|"BX"|"CX"|"DX"|"EX"|"FX"|"PC"
+<register> ::= <space_seq> <reg_name>
+
+<begin> ::= [<space_seq>] "BEGIN"
+<end> ::= [<space_seq>] "END"
+<push> ::= [<space_seq>] "PUSH" <space_seq> <value>
+<pop> ::= [<space_seq>] "POP" 
+<pushr> ::= [<space_seq>] "PUSHR" <register>
+<popr> ::= [<space_seq>] "POPR" <register>
+<add> ::= [<space_seq>] "ADD"
+<sub> ::= [<space_seq>] "SUB"
+<mul> ::= [<space_seq>] "MUL"
+<div> ::= [<space_seq>] "DIV"
+<out> ::= [<space_seq>] "OUT"
+<in> ::= [<space_seq>] "IN"
+
+<jump> ::= [<space_seq>] "JMP"|"JEQ"|"JNE"|"JA"|"JAE"|"JB"|"JBE" <label_name>
+
+<call> ::= [<space_seq>] "CALL" <label_name>
+<ret> ::= [<space_seq>] "RET"
+
+<label> ::= [<space_seq>] <label_name>":"
+
+<command> ::= <begin>|<end>|<push>|<pop>|<pushr>|<popr>|<add>|<sub>|<mul>|<div>|<out>|<in>|<jump>|<call>|<ret>|<label>
+<command_line> ::= <command> [<space_seq>] <newline_seq>
+
+<program> ::= <command_line>*
+
+jump написана неправильно

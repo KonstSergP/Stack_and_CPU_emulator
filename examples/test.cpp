@@ -1,6 +1,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <time.h>
+#include <typeinfo>
 
 #include "../include/myStack.hpp"
 #include "../src/test_system/test_system.hpp"
@@ -130,16 +131,67 @@ bool test_move_assignment()
     return (stack2 == stack3)? OK : FAIL;
 }
 
+template <typename Data_t>
+bool test_push()
+{
+
+    myStack<Data_t> stack1{SIZE};
+    myStack<Data_t> stack2{SIZE};
+
+    for (int i = 0; i < static_cast<int>(SIZE); i++)
+    {
+    	int value = std::rand();
+    	stack1.push(value);
+    	stack2.push(std::move(value));
+    }
+
+    return (stack1 == stack2) ? OK : FAIL;
+}
+
+template <typename Data_t>
+bool test_pop()
+{
+
+    myStack<Data_t> stack1{SIZE};
+    myStack<Data_t> stack2{SIZE};
+
+    for (int i = 0; i < static_cast<int>(SIZE); i++)
+    {
+    	int value = std::rand();
+    	stack1.push(value);
+    	if (i < static_cast<int>(SIZE / 2))
+    	{
+    		stack2.push(value);
+    	}
+    }
+    while (stack1.size() > stack2.size()) {stack1.pop();}
+
+    return (stack1 == stack2) ? OK : FAIL;
+}
+
+template <typename Data_t>
+bool all_tests(const char* tp)
+{
+	std::cout << "Testing type " << tp << std::endl;
+    run_test("Сonstructor",      test_constructor<Data_t>);
+    run_test("Сopy-constructor", test_copy_constructor<Data_t>);
+    run_test("Move-constructor", test_move_constructor<Data_t>);
+    run_test("Copy-assignment",  test_copy_assignment<Data_t>);
+    run_test("Move-assignment",  test_move_assignment<Data_t>);
+    run_test("Push",  test_push<Data_t>);
+    run_test("Pop",  test_pop<Data_t>);
+
+    return OK;
+}
+
 
 int main()
 {	
 	run_test("Testing system", test_testsystem, true, 2000);
-    printf("Testing myStack<int>:\n");
-    run_test("int-constructor",      test_constructor<int>);
-    run_test("int-copy-constructor", test_copy_constructor<int>);
-    run_test("int-move-constructor", test_move_constructor<int>);
-    run_test("int-copy-assignment",  test_copy_assignment<int>);
-    run_test("int-move-assignment",  test_move_assignment<int>);
+    
+    all_tests<int>("INT");
+    all_tests<long long int>("LONG LONG INT");
+    all_tests<double>("DOUBLE");
 
     printf("\n");
 
