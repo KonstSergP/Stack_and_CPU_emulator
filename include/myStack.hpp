@@ -203,7 +203,7 @@ namespace handMadeStack
 
         Data_t* new_data = (new_size > 0) ? (new Data_t[new_size]) : (nullptr);
 
-        std::copy_n(new_data, std::min(new_size, size_), data_);
+        std::copy_n(data_, std::min(new_size, size_), new_data);
 
         delete[] data_;
 
