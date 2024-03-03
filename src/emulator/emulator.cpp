@@ -23,7 +23,6 @@ void Emulator::run()
 	printf("Execution start\n");
 	while (registers[6] < static_cast<int>(programm.size()))
 	{
-		std::cout << registers[6] << " ";
 		programm[registers[6]]->execute(this);
 		registers[6]++;
 	}

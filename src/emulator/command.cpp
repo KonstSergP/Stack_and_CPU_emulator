@@ -77,42 +77,45 @@ void Command::execute(Emulator* eml)
 
 void Cmd_BEGIN::execute(Emulator* eml)
 {
-	printf("BEGIN\n");
+	//printf("BEGIN\n");
 	eml->mode = true;
 }
 
 void Cmd_END::execute(Emulator* eml)
 {
-	printf("END\n");
-	eml->mode = false;
-	eml->registers[6] = eml->programm.size();
+	//printf("END\n");
+	if (eml->mode)
+	{
+		eml->mode = false;
+		eml->registers[6] = eml->programm.size();
+	}
 }
 
 void Cmd_PUSH::execute(Emulator* eml)
 {
 	if (!eml->mode) {return;}
-	printf("PUSH %d\n", value);
+	//printf("PUSH %d\n", value);
 	eml->stack.push(value);
 }
 
 void Cmd_POP::execute(Emulator* eml)
 {
 	if (!eml->mode) {return;}
-	printf("POP\n");
+	//printf("POP\n");
 	eml->stack.pop();
 }
 
 void Cmd_PUSHR::execute(Emulator* eml)
 {
 	if (!eml->mode) {return;}
-	std::cout << "PUSHR " << reg_table[reg] << "\n";
+	//std::cout << "PUSHR " << reg_table[reg] << "\n";
 	eml->stack.push(eml->registers[reg]);
 }
 
 void Cmd_POPR::execute(Emulator* eml)
 {
 	if (!eml->mode) {return;}
-	std::cout << "POPR " << reg_table[reg] << "\n";
+	//std::cout << "POPR " << reg_table[reg] << "\n";
 	Value_t val = eml->stack.top();
 	eml->stack.pop();
 	eml->registers[reg] = val;
@@ -121,7 +124,7 @@ void Cmd_POPR::execute(Emulator* eml)
 void Cmd_ADD::execute(Emulator* eml)
 {
 	if (!eml->mode) {return;}
-	printf("ADD\n");
+	//printf("ADD\n");
 	Value_t val1 = eml->stack.top();
 	eml->stack.pop();
 	Value_t val2 = eml->stack.top();
@@ -132,7 +135,7 @@ void Cmd_ADD::execute(Emulator* eml)
 void Cmd_SUB::execute(Emulator* eml)
 {
 	if (!eml->mode) {return;}
-	printf("SUB\n");
+	//printf("SUB\n");
 	Value_t val1 = eml->stack.top();
 	eml->stack.pop();
 	Value_t val2 = eml->stack.top();
@@ -143,7 +146,7 @@ void Cmd_SUB::execute(Emulator* eml)
 void Cmd_MUL::execute(Emulator* eml)
 {
 	if (!eml->mode) {return;}
-	printf("MUL\n");
+	//printf("MUL\n");
 	Value_t val1 = eml->stack.top();
 	eml->stack.pop();
 	Value_t val2 = eml->stack.top();
@@ -154,7 +157,7 @@ void Cmd_MUL::execute(Emulator* eml)
 void Cmd_DIV::execute(Emulator* eml)
 {
 	if (!eml->mode) {return;}
-	printf("DIV\n");
+	//printf("DIV\n");
 	Value_t val1 = eml->stack.top();
 	eml->stack.pop();
 	Value_t val2 = eml->stack.top();
@@ -165,7 +168,7 @@ void Cmd_DIV::execute(Emulator* eml)
 void Cmd_OUT::execute(Emulator* eml)
 {
 	if (!eml->mode) {return;}
-	printf("OUT\n");
+	//printf("OUT\n");
 	Value_t val = eml->stack.top();
 	eml->stack.pop();
 	std::cout << val << "\n";
@@ -174,7 +177,7 @@ void Cmd_OUT::execute(Emulator* eml)
 void Cmd_IN::execute(Emulator* eml)
 {
 	if (!eml->mode) {return;}
-	printf("IN\n");
+	//printf("IN\n");
 	Value_t val;
 	std::cin >> val;
 	eml->stack.push(val);
@@ -196,15 +199,15 @@ void Cmd_JUMP::execute(Emulator* eml)
 	if (check(val1, val2))
 	{
 		eml->registers[6] = to - 1;
+		//std::cout << "JUMP " << to << "\n";
 	}
-	std::cout << "JUMP " << to << "\n";
 }
 
 void Cmd_JMP::execute(Emulator* eml)
 {
 	if (!eml->mode) {return;}
 	eml->registers[6] = to - 1;
-	std::cout << "JUMP " << to << "\n";
+	//std::cout << "JUMP " << to << "\n";
 }
 
 bool Cmd_JEQ::check(Value_t val1, Value_t val2)
@@ -241,7 +244,7 @@ bool Cmd_JBE::check(Value_t val1, Value_t val2)
 void Cmd_CALL::execute(Emulator* eml)
 {
 	if (!eml->mode) {return;}
-	std::cout << "CALL " << to << "\n";
+	//std::cout << "CALL " << to << "\n";
 	eml->stack.push(eml->registers[6]);
 	eml->registers[6] = to - 1;
 }
@@ -249,7 +252,7 @@ void Cmd_CALL::execute(Emulator* eml)
 void Cmd_RET::execute(Emulator* eml)
 {
 	if (!eml->mode) {return;}
-	printf("RET\n");
+	//printf("RET\n");
 	Value_t to = eml->stack.top();
 	eml->stack.pop();
 	eml->registers[6] = to;

@@ -72,7 +72,8 @@ bool Parser::parse_pattern(std::regex regexp, std::string& ret)
 
 bool Parser::parse_space_seq()
 {
-	std::regex pat("[ \t]+");
+	//std::regex pat("[ \t]+");
+	std::regex pat("([ \t]+|\\/\\/[^\n]*)+");
 
 	return parse_pattern(pat);
 
