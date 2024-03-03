@@ -131,37 +131,53 @@ public:
 	void execute(Emulator* eml);
 };
 
-class CMD_JUMP: public Command
+class Cmd_JUMP: public Command
 {
 public:
 
 	int to;
 
+	virtual bool check(Value_t val1, Value_t val2);
+
 	virtual void execute(Emulator* eml);
 };
 
-class Cmd_JMP: public CMD_JUMP
-{ };
+class Cmd_JMP: public Cmd_JUMP
+{
+	void execute(Emulator* eml);
+};
 
-class Cmd_JEQ: public CMD_JUMP
-{ };
+class Cmd_JEQ: public Cmd_JUMP
+{
+	bool check(Value_t val1, Value_t val2);
+};
 
-class Cmd_JNE: public CMD_JUMP
-{ };
+class Cmd_JNE: public Cmd_JUMP
+{
+	bool check(Value_t val1, Value_t val2);
+};
 
-class Cmd_JA: public CMD_JUMP
-{ };
+class Cmd_JA: public Cmd_JUMP
+{
+	bool check(Value_t val1, Value_t val2);
+};
 
-class Cmd_JAE: public CMD_JUMP
-{ };
+class Cmd_JAE: public Cmd_JUMP
+{
+	bool check(Value_t val1, Value_t val2);
+};
 
-class Cmd_JB: public CMD_JUMP
-{ };
+class Cmd_JB: public Cmd_JUMP
+{
+	bool check(Value_t val1, Value_t val2);
+};
 
-class Cmd_JBE: public CMD_JUMP
-{ };
+class Cmd_JBE: public Cmd_JUMP
+{
+	bool check(Value_t val1, Value_t val2);
+};
 
-class Cmd_CALL: public CMD_JUMP
+class Cmd_CALL: public Cmd_JUMP
 {
 public:
 	void execute(Emulator* eml);

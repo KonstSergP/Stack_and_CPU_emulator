@@ -95,7 +95,6 @@ void Cmd_PUSH::execute(Emulator* eml)
 	eml->stack.push(value);
 }
 
-
 void Cmd_POP::execute(Emulator* eml)
 {
 	if (!eml->mode) {return;}
@@ -181,11 +180,61 @@ void Cmd_IN::execute(Emulator* eml)
 	eml->stack.push(val);
 }
 
-void CMD_JUMP::execute(Emulator* eml)
+bool Cmd_JUMP::check(Value_t val1, Value_t val2)
+{
+	return (val1 == val2) || (val1 != val2);
+}
+
+void Cmd_JUMP::execute(Emulator* eml)
 {
 	if (!eml->mode) {return;}
-	eml->programm.size();
+	Value_t val1 = eml->stack.top();
+	eml->stack.pop();
+	Value_t val2 = eml->stack.top();
+	eml->stack.push(val1);
+
+	if (check(val1, val2))
+	{
+		eml->registers[6] = to - 1;
+	}
 	std::cout << "JUMP " << to << "\n";
+}
+
+void Cmd_JMP::execute(Emulator* eml)
+{
+	if (!eml->mode) {return;}
+	eml->registers[6] = to - 1;
+	std::cout << "JUMP " << to << "\n";
+}
+
+bool Cmd_JEQ::check(Value_t val1, Value_t val2)
+{
+	return val1 == val2;
+}
+
+bool Cmd_JNE::check(Value_t val1, Value_t val2)
+{
+	return val1 != val2;
+}
+
+bool Cmd_JA::check(Value_t val1, Value_t val2)
+{
+	return val1 > val2;
+}
+
+bool Cmd_JAE::check(Value_t val1, Value_t val2)
+{
+	return val1 >= val2;
+}
+
+bool Cmd_JB::check(Value_t val1, Value_t val2)
+{
+	return val1 < val2;
+}
+
+bool Cmd_JBE::check(Value_t val1, Value_t val2)
+{
+	return val1 <= val2;
 }
 
 
@@ -193,10 +242,15 @@ void Cmd_CALL::execute(Emulator* eml)
 {
 	if (!eml->mode) {return;}
 	std::cout << "CALL " << to << "\n";
+	eml->stack.push(eml->registers[6]);
+	eml->registers[6] = to - 1;
 }
 
 void Cmd_RET::execute(Emulator* eml)
 {
 	if (!eml->mode) {return;}
 	printf("RET\n");
+	Value_t to = eml->stack.top();
+	eml->stack.pop();
+	eml->registers[6] = to;
 }

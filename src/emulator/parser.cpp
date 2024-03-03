@@ -95,7 +95,7 @@ bool Parser::parse_value(Value_t& value)
 {
 	parse_space_seq();
 
-	std::regex pat("(\\+|-)?[1-9][0-9]*");
+	std::regex pat("0|(\\+|-)?[1-9][0-9]*");
 
 	std::string val;
 
@@ -113,7 +113,7 @@ bool Parser::parse_label_name(std::string& name)
 {
 	parse_space_seq();
 
-	std::regex pat("[a-zA-Z]+");
+	std::regex pat("[a-zA-Z0-9_]+");
 
 	return parse_pattern(pat, name);
 
@@ -132,7 +132,7 @@ Reg_t Parser::parse_register()
 
 std::string Parser::parse_command_name()
 {
-	std::regex pat("PUSHR|POPR|BEGIN|END|PUSH|POP|ADD|SUB|MUL|DIV|OUT|IN|JMP|JEQ|JNE|JAE|JA|JBE|JB|CALL|RET|[a-zA-Z]+:");
+	std::regex pat("PUSHR|POPR|BEGIN|END|PUSH|POP|ADD|SUB|MUL|DIV|OUT|IN|JMP|JEQ|JNE|JAE|JA|JBE|JB|CALL|RET|[a-zA-Z0-9_]+:");
 	std::string com;
 	parse_pattern(pat, com);
 
@@ -142,9 +142,9 @@ std::string Parser::parse_command_name()
 void Parser::parse_command_line(Command*& ret, int& status, int number)
 {
 	parse_space_seq();
-
 	std::string name = parse_command_name();
 	Cmd_t cmd_id = cmd_id_from_name(name);
+
 	Value_t val;
 	Reg_t rg;
 
@@ -161,7 +161,6 @@ void Parser::parse_command_line(Command*& ret, int& status, int number)
 
 		parse_value(val);
 		dynamic_cast<Cmd_PUSH*>(ret)->value = val;
-		
 		break;
 	case CMD_ID::POP:
 		ret = new Cmd_POP();
@@ -249,7 +248,6 @@ void Parser::parse_command_line(Command*& ret, int& status, int number)
 		parse_label_name(lbl);
 		jumps.push_back(std::pair<std::string, int>(lbl, number));
 	}
-
 	parse_space_seq();
 	parse_newline_seq();
 
@@ -263,7 +261,7 @@ std::vector<Command*> Parser::parse_programm()
 	int res = 2;
 	int i = 0;
 	while (!file_.eof())
-	{	
+	{
 		res = 2;
 		parse_command_line(cm, res, i);
 
@@ -281,7 +279,7 @@ std::vector<Command*> Parser::parse_programm()
 		{
 			if (jumps[i].first == labels[j].first)
 			{
-				dynamic_cast<CMD_JUMP*>(vec[jumps[i].second])->to = labels[j].second;
+				dynamic_cast<Cmd_JUMP*>(vec[jumps[i].second])->to = labels[j].second;
 			}
 		}
 	}
