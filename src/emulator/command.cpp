@@ -140,7 +140,7 @@ void Cmd_SUB::execute(Emulator* eml)
 	eml->stack.pop();
 	Value_t val2 = eml->stack.top();
 	eml->stack.pop();
-	eml->stack.push(val2 - val1);
+	eml->stack.push(val1 - val2);
 }
 
 void Cmd_MUL::execute(Emulator* eml)

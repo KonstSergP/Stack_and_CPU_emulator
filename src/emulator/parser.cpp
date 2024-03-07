@@ -142,6 +142,7 @@ std::string Parser::parse_command_name()
 
 void Parser::parse_command_line(Command*& ret, int& status, int number)
 {
+	parse_newline_seq();
 	parse_space_seq();
 	std::string name = parse_command_name();
 	Cmd_t cmd_id = cmd_id_from_name(name);

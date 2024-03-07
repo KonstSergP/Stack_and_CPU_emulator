@@ -18,8 +18,7 @@ Emulator::Emulator(const std::vector<Command*>& vec)
 }
 
 void Emulator::run()
-{	
-	std::cout << programm.size() << "\n";
+{
 	printf("Execution start\n");
 	while (registers[6] < static_cast<int>(programm.size()))
 	{

@@ -9,7 +9,7 @@
 int main()
 {
 
-    Parser parser("programm.test");
+    Parser parser("factorial_rec.test");
 
     Emulator eml(parser.parse_programm());
     
