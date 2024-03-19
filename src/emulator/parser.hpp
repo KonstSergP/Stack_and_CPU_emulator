@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <regex>
 #include <vector>
+#include <map>
 
 #include "command.hpp"
 
@@ -30,8 +31,9 @@ private:
 	const char* pos_;
 	const char* end_;
 	char line_[MAX_LINE_LEN];
-	std::vector<std::pair<std::string, int>> labels;
-	std::vector<std::pair<std::string, int>> jumps;
+	size_t line_counter_;
+	std::map<std::string, int> labels_;
+	std::map<int, std::string> jumps_;
 
 	bool parse_pattern(std::regex regexp);
 	bool parse_pattern(std::regex regexp, std::string& ret);
@@ -39,17 +41,17 @@ private:
 	void read_line_from_file();
 
 	void parse_command_line(Command*& ret, int& status, int number);
-	std::string parse_command_name();
+	bool parse_command_name(std::string& name);
 
-	Reg_t parse_register();
-
+	bool parse_register(Reg_t& rg);
 	bool parse_label_name(std::string& name);
 	bool parse_value(Value_t& val);
 
 	bool parse_space_seq();
 	bool parse_newline_seq();
+	bool parse_comment();
 
-
+	void ASSERT_PARS(bool contract, const char* msg);
 
 
 }; // class Parser

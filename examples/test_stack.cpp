@@ -5,9 +5,10 @@
 
 #include "../include/myStack.hpp"
 #include "../src/test_system/test_system.hpp"
+#include "../include/logger.hpp"
 
 #define CHECK(x) if (not (x)) {return FAIL;}
-constexpr size_t SIZE = 100U;
+constexpr size_t SIZE = 10U;
 
 bool test_ok()
 {
@@ -82,7 +83,7 @@ bool test_copy_constructor()
 
     myStack<Data_t> stack2{stack1};
 
-    return (stack1 == stack2)? OK : FAIL;
+    return (stack1 == stack2) ? OK : FAIL;
 }
 
 template <typename Data_t>
@@ -97,7 +98,7 @@ bool test_move_constructor()
 
     myStack<Data_t> stack3{std::move(stack1)};
 
-    return (stack2 == stack3)? OK : FAIL;
+    return (stack2 == stack3) ? OK : FAIL;
 }
 
 template <typename Data_t>
@@ -111,7 +112,9 @@ bool test_copy_assignment()
 
     stack2 = stack1;
 
-    return (stack1 == stack2) ? OK : FAIL;
+    myStack<Data_t> stack3{SIZE};
+
+    return ((stack1 == stack2) && (stack1 != stack3)) ? OK : FAIL;
 }
 
 template <typename Data_t>
@@ -170,6 +173,22 @@ bool test_pop()
 }
 
 template <typename Data_t>
+bool test_emplace()
+{
+
+    myStack<Data_t> stack1{SIZE};
+    myStack<Data_t> stack2{SIZE};
+
+    stack1.emplace(0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
+    for (int i = 0; i < 10; i++)
+    {
+        stack2.push(i);
+    }
+
+    return (stack1 == stack2) ? OK : FAIL;
+}
+
+template <typename Data_t>
 bool all_tests(const char* tp)
 {
 	std::cout << "Testing type " << tp << std::endl;
@@ -180,6 +199,7 @@ bool all_tests(const char* tp)
     run_test("Move-assignment",  test_move_assignment<Data_t>);
     run_test("Push",  test_push<Data_t>);
     run_test("Pop",  test_pop<Data_t>);
+    run_test("Emplace",  test_emplace<Data_t>);
 
     return OK;
 }
@@ -192,6 +212,8 @@ int main()
     all_tests<int>("INT");
     all_tests<long long int>("LONG LONG INT");
     all_tests<double>("DOUBLE");
+
+    all_tests<Logger<int>>("LOGGER<INT>");
 
     printf("\n");
 

@@ -1,5 +1,6 @@
 #include <iostream>
 #include <stdlib.h>
+#include <cstring>
 #include "command.hpp"
 
 #include "emulator.hpp"

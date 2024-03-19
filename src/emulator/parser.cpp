@@ -3,11 +3,31 @@
 #include <regex>
 #include <fstream>
 #include <iterator>
+#include <map>
 
 #include "parser.hpp"
 #include "command.hpp"
 #include "../../include/utils.hpp"
 
+
+void Parser::ASSERT_PARS(bool contract, const char* msg)
+{
+	if (contract) {return;}
+
+	long int diff = pos_ - line_;
+	printf("Parsing error in line %lu:%ld\n", line_counter_, diff+1);
+	printf("%s\n", msg);
+
+	size_t ln = strlen(line_);
+    for (size_t i = 0; i < ln; i++)
+    {
+        if (line_[i] == '\t') {line_[i] = ' ';}
+    }
+
+	printf("%s\n", line_);
+	std::cout << std::string(diff, ' ') << "^\n";
+	abort();
+}
 
 
 Parser::Parser(const char* filename):
@@ -15,6 +35,7 @@ Parser::Parser(const char* filename):
 {	
 	ASSERT(file_.good(), "Unable to open file \'%s\'\n", filename);
 
+	line_counter_ = 0;
 	read_line_from_file();
 }
 
@@ -24,6 +45,7 @@ void Parser::read_line_from_file()
 	ASSERT(!file_.eof(), "EOF, cannot read line\n");
 
 	file_.getline(line_, MAX_LINE_LEN);
+	line_counter_++;
 	pos_ = line_;
 	end_ = line_ + strlen(line_);
 
@@ -72,18 +94,24 @@ bool Parser::parse_pattern(std::regex regexp, std::string& ret)
 
 bool Parser::parse_space_seq()
 {
-	//std::regex pat("[ \t]+");
-	std::regex pat("([ \t]+|\\/\\/[^\n]*)+");
+	std::regex pat("[ \t]+");
 
 	return parse_pattern(pat);
 
+}
+
+bool Parser::parse_comment()
+{
+	std::regex pat("[ \t]*\\/\\/[^\n]*");
+
+	return parse_pattern(pat);
 }
 
 bool Parser::parse_newline_seq()
 {
 	bool status = (pos_ == end_);
 
-	while ((pos_ == end_) && !file_.eof())
+	while ((pos_ == end_ || parse_comment() || (parse_space_seq() && pos_ == end_)) && !file_.eof())
 	{
 		read_line_from_file();
 	}
@@ -94,7 +122,6 @@ bool Parser::parse_newline_seq()
 
 bool Parser::parse_value(Value_t& value)
 {
-	parse_space_seq();
 
 	std::regex pat("0|(\\+|-)?[1-9][0-9]*");
 
@@ -112,7 +139,6 @@ bool Parser::parse_value(Value_t& value)
 
 bool Parser::parse_label_name(std::string& name)
 {
-	parse_space_seq();
 
 	std::regex pat("[a-zA-Z0-9_]+");
 
@@ -120,31 +146,33 @@ bool Parser::parse_label_name(std::string& name)
 
 }
 
-Reg_t Parser::parse_register()
+bool Parser::parse_register(Reg_t& rg)
 {
-	parse_space_seq();
 
 	std::regex pat("AX|BX|CX|DX|EX|FX|PC");
 	std::string reg;
-	parse_pattern(pat, reg);
+	bool success = parse_pattern(pat, reg);
 
-	return reg_id_from_name(reg);
+	if (success)
+	{
+		rg = reg_id_from_name(reg);
+	}
+
+	return success;
 }
 
-std::string Parser::parse_command_name()
+bool Parser::parse_command_name(std::string& st)
 {
 	std::regex pat("PUSHR|POPR|BEGIN|END|PUSH|POP|ADD|SUB|MUL|DIV|OUT|IN|JMP|JEQ|JNE|JAE|JA|JBE|JB|CALL|RET|[a-zA-Z0-9_]+:");
-	std::string com;
-	parse_pattern(pat, com);
-
-	return com;
+	return parse_pattern(pat, st);
 }
 
 void Parser::parse_command_line(Command*& ret, int& status, int number)
 {
 	parse_newline_seq();
 	parse_space_seq();
-	std::string name = parse_command_name();
+	std::string name;
+	ASSERT_PARS(parse_command_name(name), "Expected command or label");
 	Cmd_t cmd_id = cmd_id_from_name(name);
 
 	Value_t val;
@@ -161,7 +189,8 @@ void Parser::parse_command_line(Command*& ret, int& status, int number)
 	case CMD_ID::PUSH:
 		ret = new Cmd_PUSH();
 
-		parse_value(val);
+		ASSERT_PARS(parse_space_seq(), "Expected space sequence");
+		ASSERT_PARS(parse_value(val), "Expected value");
 		dynamic_cast<Cmd_PUSH*>(ret)->value = val;
 		break;
 	case CMD_ID::POP:
@@ -170,14 +199,16 @@ void Parser::parse_command_line(Command*& ret, int& status, int number)
 	case CMD_ID::PUSHR:
 		ret = new Cmd_PUSHR();
 
-		rg = parse_register();
+		ASSERT_PARS(parse_space_seq(), "Expected space sequence");
+		ASSERT_PARS(parse_register(rg), "Expected register name");
 		dynamic_cast<Cmd_PUSHR*>(ret)->reg = rg;
 
 		break;
 	case CMD_ID::POPR:
 		ret = new Cmd_POPR();
 
-		rg = parse_register();
+		ASSERT_PARS(parse_space_seq(), "Expected space sequence");
+		ASSERT_PARS(parse_register(rg), "Expected register name");
 		dynamic_cast<Cmd_POPR*>(ret)->reg = rg;
 
 		break;
@@ -235,23 +266,22 @@ void Parser::parse_command_line(Command*& ret, int& status, int number)
 		ret = new Cmd_RET();
 		break;
 	default:
-		//ret = new Cmd_LABEL();
 		name.pop_back();
 
-		//dynamic_cast<Cmd_LABEL*>(ret)->name = name;
 		status = 0;
-		labels.push_back(std::pair<std::string, int>(name, number));
+		labels_[name] = number;
 
 	} // switch
 
 	if (status == 1)
 	{
 		std::string lbl;
-		parse_label_name(lbl);
-		jumps.push_back(std::pair<std::string, int>(lbl, number));
+		ASSERT_PARS(parse_space_seq(), "Expected space sequence");
+		ASSERT_PARS(parse_label_name(lbl), "Expected label name");
+		jumps_[number] = lbl;
 	}
 	parse_space_seq();
-	parse_newline_seq();
+	ASSERT_PARS(parse_newline_seq(), "Expected a new line after command/label");
 
 } // parse_command
 
@@ -275,14 +305,17 @@ std::vector<Command*> Parser::parse_programm()
 	}
 
 
-	for (size_t i = 0; i < jumps.size(); i++)
+	for (const auto& [number, name] : jumps_)
 	{
-		for (size_t j = 0; j < labels.size(); j++)
+		auto search = labels_.find(name);
+		if (search != labels_.end())
 		{
-			if (jumps[i].first == labels[j].first)
-			{
-				dynamic_cast<Cmd_JUMP*>(vec[jumps[i].second])->to = labels[j].second;
-			}
+			dynamic_cast<Cmd_JUMP*>(vec[number])->to = labels_[name];
+		}
+		else
+		{
+			std::cout << "Unknown label:" << name << "\n";
+			abort();
 		}
 	}
 

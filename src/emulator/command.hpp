@@ -3,8 +3,8 @@
 #include <fstream>
 #include <stdlib.h>
 #include <vector>
+#include <cstring>
 
-//#include "emulator.hpp"
 class Emulator;
 
 typedef int Value_t;
@@ -13,10 +13,6 @@ typedef uint8_t Cmd_t;
 constexpr int MAX_LINE_LEN = 100;
 
 extern std::vector<std::string> reg_table, cmd_table;
-
-
-Reg_t reg_id_from_name(std::string name);
-
 
 enum CMD_ID: Cmd_t
 {
@@ -43,6 +39,7 @@ enum CMD_ID: Cmd_t
 	RET = 20
 };
 
+Reg_t reg_id_from_name(std::string name);
 Cmd_t cmd_id_from_name(std::string name);
 
 class Command
@@ -139,12 +136,12 @@ public:
 
 	virtual bool check(Value_t val1, Value_t val2);
 
-	virtual void execute(Emulator* eml);
+	void execute(Emulator* eml);
 };
 
 class Cmd_JMP: public Cmd_JUMP
 {
-	void execute(Emulator* eml);
+	void execute(Emulator* eml) override;
 };
 
 class Cmd_JEQ: public Cmd_JUMP
@@ -177,10 +174,13 @@ class Cmd_JBE: public Cmd_JUMP
 	bool check(Value_t val1, Value_t val2);
 };
 
+
+// CALL inherits from Cmd_JUMP because parser will not know
+// is it call or another jump
 class Cmd_CALL: public Cmd_JUMP
 {
 public:
-	void execute(Emulator* eml);
+	void execute(Emulator* eml) override;
 };
 
 class Cmd_RET: public Command

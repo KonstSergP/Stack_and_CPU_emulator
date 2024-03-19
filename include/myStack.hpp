@@ -3,6 +3,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <algorithm>
+#include <utility>
 #include "utils.hpp"
 
 
@@ -47,6 +48,32 @@ namespace handMadeStack
         bool operator!=(const myStack& other) const;
 
         bool good() const;
+
+
+        template <typename V_t>
+        void emplace(V_t val)
+        {
+            ASSERT(this->good(), "Invalid stack\n");
+
+            if (size_ == capacity_)
+            {
+                this->resize(capacity_*2 + 1);
+            }
+
+            new (data_ + size_) Data_t(val);
+            size_++;
+
+            ASSERT(this->good(), "Unable to emplace element\n");
+        }
+
+        template<typename V_t, typename... Args>
+        void emplace(V_t val, Args... args)
+        {
+            emplace(val);
+
+            emplace(args...) ;
+        }
+
 
 	private:
 
@@ -203,7 +230,8 @@ namespace handMadeStack
 
         Data_t* new_data = (new_size > 0) ? (new Data_t[new_size]) : (nullptr);
 
-        std::copy_n(data_, std::min(new_size, size_), new_data);
+        //std::copy_n(data_, std::min(new_size, size_), new_data);
+        my_copy_n(data_, std::min(new_size, size_), new_data);
 
         delete[] data_;
 
