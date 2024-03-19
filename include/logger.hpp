@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <utility>
 #include <vector>
-
+#include <cstring>
 
 struct Log_store
 {

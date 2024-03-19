@@ -32,8 +32,8 @@ BEGIN
 	JEQ zero
 	POP
 	PUSH 1
-	POPR AX
-	POPR BX
+	POPR AX // answer
+	POPR BX // input number
 	CALL fact
 	PUSHR AX
 OUT

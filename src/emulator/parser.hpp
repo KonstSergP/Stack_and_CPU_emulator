@@ -6,6 +6,7 @@
 #include <regex>
 #include <vector>
 #include <map>
+#include <cstring>
 
 #include "command.hpp"
 

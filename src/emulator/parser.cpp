@@ -4,6 +4,7 @@
 #include <fstream>
 #include <iterator>
 #include <map>
+#include <cstring>
 
 #include "parser.hpp"
 #include "command.hpp"
@@ -109,10 +110,11 @@ bool Parser::parse_comment()
 
 bool Parser::parse_newline_seq()
 {
-	bool status = (pos_ == end_);
+	bool status = false;
 
 	while ((pos_ == end_ || parse_comment() || (parse_space_seq() && pos_ == end_)) && !file_.eof())
 	{
+		status = true;
 		read_line_from_file();
 	}
 
