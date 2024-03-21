@@ -288,7 +288,7 @@ void Parser::parse_command_line(Command*& ret, int& status, int number)
 } // parse_command
 
 
-std::vector<Command*> Parser::parse_programm()
+std::vector<Command*> Parser::parse_program()
 {
 	std::vector<Command*> vec;
 	Command* cm;
@@ -321,5 +321,144 @@ std::vector<Command*> Parser::parse_programm()
 		}
 	}
 
+	program = vec;
+
 	return vec;
+}
+
+void Parser::save(const char* filename)
+{
+	std::ofstream out(filename, std::ios::binary);
+
+	for (size_t i = 0; i < program.size(); i++)
+	{
+		program[i]->serialize(out);
+	}
+
+	out.close();
+
+}
+
+std::vector<Command*> Parser::load_binary(const char* filename)
+{
+	std::ifstream in(filename, std::ios::binary);
+	Cmd_t code;
+	Value_t val;
+	Reg_t reg;
+	int too;
+	int status = 0;
+	Command* ret;
+	std::vector<Command*> vec;
+
+	while (!in.eof())
+	{
+		in.read((char*)&code, sizeof(code));
+
+		switch (code)
+		{
+		case CMD_ID::BEGIN:
+			ret =  new Cmd_BEGIN();
+			break;
+		case CMD_ID::END:
+			ret = new Cmd_END();
+			break;
+		case CMD_ID::PUSH:
+			ret = new Cmd_PUSH();
+
+			in.read((char*)&val, sizeof(val));
+
+			dynamic_cast<Cmd_PUSH*>(ret)->value = val;
+			break;
+		case CMD_ID::POP:
+			ret = new Cmd_POP();
+			break;
+		case CMD_ID::PUSHR:
+			ret = new Cmd_PUSHR();
+
+			in.read((char*)&reg, sizeof(reg));
+
+			dynamic_cast<Cmd_PUSHR*>(ret)->reg = reg;
+
+			break;
+		case CMD_ID::POPR:
+			ret = new Cmd_POPR();
+
+			in.read((char*)&reg, sizeof(reg));
+			
+			dynamic_cast<Cmd_POPR*>(ret)->reg = reg;
+
+			break;
+		case CMD_ID::ADD:
+			ret = new Cmd_ADD();
+			break;
+		case CMD_ID::SUB:
+			ret = new Cmd_SUB();
+			break;
+		case CMD_ID::MUL:
+			ret = new Cmd_MUL();
+			break;
+		case CMD_ID::DIV:
+			ret = new Cmd_DIV();
+			break;
+		case CMD_ID::OUT:
+			ret = new Cmd_OUT();
+			break;
+		case CMD_ID::IN:
+			ret = new Cmd_IN();
+			break;
+		case CMD_ID::JMP:
+			ret = new Cmd_JMP();
+			status = 1;
+			break;
+		case CMD_ID::JEQ:
+			ret = new Cmd_JEQ();
+			status = 1;
+			break;
+		case CMD_ID::JNE:
+			ret = new Cmd_JNE();
+			status = 1;
+			break;
+		case CMD_ID::JA:
+			ret = new Cmd_JA();
+			status = 1;
+			break;
+		case CMD_ID::JAE:
+			ret = new Cmd_JAE();
+			status = 1;
+			break;
+		case CMD_ID::JB:
+			ret = new Cmd_JB();
+			status = 1;
+			break;
+		case CMD_ID::JBE:
+			ret = new Cmd_JBE();
+			status = 1;
+			break;
+		case CMD_ID::CALL:
+			ret = new Cmd_CALL();
+			status = 1;
+			break;
+		case CMD_ID::RET:
+			ret = new Cmd_RET();
+			break;
+		default:
+			printf("Wrong code\n");
+			abort();
+		}
+
+		if (status == 1)
+		{
+			in.read((char*)&too, sizeof(too));
+			dynamic_cast<Cmd_JUMP*>(ret)->to = too;
+		}
+
+		vec.push_back(ret);
+
+		status = 0;
+
+	}
+
+	program = vec;
+	return vec;
+
 }

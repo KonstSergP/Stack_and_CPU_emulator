@@ -1,6 +1,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <cstring>
+#include <fstream>
 #include "command.hpp"
 
 #include "emulator.hpp"
@@ -76,6 +77,12 @@ void Command::execute(Emulator* eml)
 	std::cout << eml->registers[6] << "\n";
 }
 
+void Command::serialize(std::ofstream& out)
+{
+	//out << id;
+	out.write((char*)&id, sizeof(id)); // 1 byte?
+}
+
 void Cmd_BEGIN::execute(Emulator* eml)
 {
 	//printf("BEGIN\n");
@@ -88,7 +95,7 @@ void Cmd_END::execute(Emulator* eml)
 	if (eml->mode)
 	{
 		eml->mode = false;
-		eml->registers[6] = eml->programm.size();
+		eml->registers[6] = eml->program.size();
 	}
 }
 
@@ -97,6 +104,14 @@ void Cmd_PUSH::execute(Emulator* eml)
 	if (!eml->mode) {return;}
 	//printf("PUSH %d\n", value);
 	eml->stack.push(value);
+}
+
+void Cmd_PUSH::serialize(std::ofstream& out)
+{
+	//out << id;
+	//out << value; //////////////////////////////////////////////
+	out.write((char*)&id, sizeof(id));
+	out.write((char*)&value, sizeof(value));
 }
 
 void Cmd_POP::execute(Emulator* eml)
@@ -113,6 +128,14 @@ void Cmd_PUSHR::execute(Emulator* eml)
 	eml->stack.push(eml->registers[reg]);
 }
 
+void Cmd_PUSHR::serialize(std::ofstream& out)
+{
+	//out << id;
+	//out << reg;////////////////////////////////////////////////
+	out.write((char*)&id, sizeof(id));
+	out.write((char*)&reg, sizeof(reg));
+}
+
 void Cmd_POPR::execute(Emulator* eml)
 {
 	if (!eml->mode) {return;}
@@ -120,6 +143,14 @@ void Cmd_POPR::execute(Emulator* eml)
 	Value_t val = eml->stack.top();
 	eml->stack.pop();
 	eml->registers[reg] = val;
+}
+
+void Cmd_POPR::serialize(std::ofstream& out)
+{
+	//out << id;
+	//out << reg;////////////////////////////////////////////////
+	out.write((char*)&id, sizeof(id));
+	out.write((char*)&reg, sizeof(reg));
 }
 
 void Cmd_ADD::execute(Emulator* eml)
@@ -202,6 +233,14 @@ void Cmd_JUMP::execute(Emulator* eml)
 		eml->registers[6] = to - 1;
 		//std::cout << "JUMP " << to << "\n";
 	}
+}
+
+void Cmd_JUMP::serialize(std::ofstream& out)
+{
+	//out << id;
+	//out << to;////////////////////////////////////////////////
+	out.write((char*)&id, sizeof(id));
+	out.write((char*)&to, sizeof(to));
 }
 
 void Cmd_JMP::execute(Emulator* eml)

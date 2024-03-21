@@ -24,7 +24,10 @@ public:
 
 	Parser(const char* filename);
 
-	std::vector<Command*> parse_programm();
+	std::vector<Command*> parse_program();
+	std::vector<Command*> load_binary(const char* filename);
+
+	void save(const char* filename);
 
 private:
 
@@ -35,6 +38,7 @@ private:
 	size_t line_counter_;
 	std::map<std::string, int> labels_;
 	std::map<int, std::string> jumps_;
+	std::vector<Command*> program;
 
 	bool parse_pattern(std::regex regexp);
 	bool parse_pattern(std::regex regexp, std::string& ret);

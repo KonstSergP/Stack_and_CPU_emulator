@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <vector>
 #include <cstring>
+#include <cstdint>
+#include <fstream>
 
 class Emulator;
 
@@ -45,7 +47,9 @@ Cmd_t cmd_id_from_name(std::string name);
 class Command
 {
 public:
+	Cmd_t id = 255;
 	virtual void execute(Emulator* eml);
+	virtual void serialize(std::ofstream& out);
 
 }; // class Command
 
@@ -53,19 +57,23 @@ public:
 class Cmd_BEGIN: public Command
 {
 public:
+	Cmd_BEGIN() {id = CMD_ID::BEGIN;}
 	void execute(Emulator* eml);
 };
 
 class Cmd_END: public Command
 {
 public:
+	Cmd_END() {id = CMD_ID::END;}
 	void execute(Emulator* eml);
 };
 
 class Cmd_PUSH: public Command
 {
 public:
+	Cmd_PUSH() {id = CMD_ID::PUSH;}
 	void execute(Emulator* eml);
+	void serialize(std::ofstream& out);
 
 	Value_t value;
 };
@@ -73,104 +81,126 @@ public:
 class Cmd_POP: public Command
 {
 public:
+	Cmd_POP() {id = CMD_ID::POP;}
 	void execute(Emulator* eml);
 };
 
 class Cmd_PUSHR: public Command
 {
 public:
+	Cmd_PUSHR() {id = CMD_ID::PUSHR;}
 	void execute(Emulator* eml);
-
+	void serialize(std::ofstream& out);
 	Reg_t reg;
 };
 
 class Cmd_POPR: public Command
 {
 public:
+	Cmd_POPR() {id = CMD_ID::POPR;}
 	void execute(Emulator* eml);
-
+	void serialize(std::ofstream& out);
 	Reg_t reg;
 };
 
 class Cmd_ADD: public Command
 {
 public:
+	Cmd_ADD() {id = CMD_ID::ADD;}
 	void execute(Emulator* eml);
 };
 
 class Cmd_SUB: public Command
 {
 public:
+	Cmd_SUB() {id = CMD_ID::SUB;}
 	void execute(Emulator* eml);
 };
 
 class Cmd_MUL: public Command
 {
 public:
+	Cmd_MUL() {id = CMD_ID::MUL;}
 	void execute(Emulator* eml);
 };
 
 class Cmd_DIV: public Command
 {
 public:
+	Cmd_DIV() {id = CMD_ID::DIV;}
 	void execute(Emulator* eml);
 };
 
 class Cmd_OUT: public Command
 {
 public:
+	Cmd_OUT() {id = CMD_ID::OUT;}
 	void execute(Emulator* eml);
 };
 
 class Cmd_IN: public Command
 {
 public:
+	Cmd_IN() {id = CMD_ID::IN;}
 	void execute(Emulator* eml);
 };
 
 class Cmd_JUMP: public Command
 {
 public:
-
 	int to;
 
 	virtual bool check(Value_t val1, Value_t val2);
-
+	void serialize(std::ofstream& out);
 	void execute(Emulator* eml);
 };
 
 class Cmd_JMP: public Cmd_JUMP
 {
+public:
+	Cmd_JMP() {id = CMD_ID::JMP;}
 	void execute(Emulator* eml) override;
 };
 
 class Cmd_JEQ: public Cmd_JUMP
 {
+public:
+	Cmd_JEQ() {id = CMD_ID::JEQ;}
 	bool check(Value_t val1, Value_t val2);
 };
 
 class Cmd_JNE: public Cmd_JUMP
 {
+public:
+	Cmd_JNE() {id = CMD_ID::JNE;}
 	bool check(Value_t val1, Value_t val2);
 };
 
 class Cmd_JA: public Cmd_JUMP
 {
+public:
+	Cmd_JA() {id = CMD_ID::JA;}
 	bool check(Value_t val1, Value_t val2);
 };
 
 class Cmd_JAE: public Cmd_JUMP
 {
+public:
+	Cmd_JAE() {id = CMD_ID::JAE;}
 	bool check(Value_t val1, Value_t val2);
 };
 
 class Cmd_JB: public Cmd_JUMP
 {
+public:
+	Cmd_JB() {id = CMD_ID::JB;}
 	bool check(Value_t val1, Value_t val2);
 };
 
 class Cmd_JBE: public Cmd_JUMP
 {
+public:
+	Cmd_JBE() {id = CMD_ID::JBE;}
 	bool check(Value_t val1, Value_t val2);
 };
 
@@ -180,11 +210,13 @@ class Cmd_JBE: public Cmd_JUMP
 class Cmd_CALL: public Cmd_JUMP
 {
 public:
+	Cmd_CALL() {id = CMD_ID::CALL;}
 	void execute(Emulator* eml) override;
 };
 
 class Cmd_RET: public Command
 {
 public:
+	Cmd_RET() {id = CMD_ID::RET;}
 	void execute(Emulator* eml);
 };

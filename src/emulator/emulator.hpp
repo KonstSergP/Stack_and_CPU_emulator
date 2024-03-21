@@ -14,7 +14,7 @@ using namespace handMadeStack;
 class Emulator
 {
 public:
-	std::vector<Command*> programm;
+	std::vector<Command*> program;
 	myStack<Value_t> stack;
 	int registers[7];
 	bool mode;

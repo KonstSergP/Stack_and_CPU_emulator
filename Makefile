@@ -75,17 +75,20 @@ $(OBJDIR)/%.o: %.cpp $(INCLUDES) Makefile
 run: $(EXECUTABLE)
 	@./$(EXECUTABLE)
 
-phibonacci: $(EXECUTABLE)
-	@./$(EXECUTABLE) phibonacci.test
+phibonacci: $(EXECUTABLE) $(OBJDIR)/compile
+	./build/compile phibonacci
+	$(EXECUTABLE) phibonacci
 
-factorial: $(EXECUTABLE)
-	@./$(EXECUTABLE) factorial.test
+factorial: $(EXECUTABLE) $(OBJDIR)/compile
+	./build/compile factorial
+	$(EXECUTABLE) factorial
 
-factorial_rec: $(EXECUTABLE)
-	@./$(EXECUTABLE) factorial_rec.test
+factorial_rec: $(EXECUTABLE) $(OBJDIR)/compile
+	./build/compile factorial_rec
+	$(EXECUTABLE) factorial_rec
 
 %: $(OBJDIR)/%
-	@./$<
+	./$<
 
 #---------------
 # Other tools

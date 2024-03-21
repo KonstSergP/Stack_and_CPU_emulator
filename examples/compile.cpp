@@ -24,11 +24,10 @@ int main(int argc, char **argv)
     	std::cout << "Wrong number of arguments\n";
     }
 
-    Parser parser((std::string("build/") + filename + std::string(".bc")).c_str());
+    Parser parser((std::string("programs/") + filename + std::string(".test")).c_str());
 
-    Emulator eml(parser.load_binary((std::string("build/") + filename + std::string(".bc")).c_str()));
-
-    eml.run();
+    parser.parse_program();
+    parser.save((std::string("build/") + filename + std::string(".bc")).c_str());
 
 	return 0;
 }

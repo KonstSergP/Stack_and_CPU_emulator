@@ -12,7 +12,7 @@ using namespace handMadeStack;
 
 Emulator::Emulator(const std::vector<Command*>& vec)
 {
-	programm = vec;
+	program = vec;
 	memset(registers, 0, sizeof(int)*7);
 	mode = false;
 }
@@ -20,9 +20,9 @@ Emulator::Emulator(const std::vector<Command*>& vec)
 void Emulator::run()
 {
 	printf("Execution start\n");
-	while (registers[6] < static_cast<int>(programm.size()))
+	while (registers[6] < static_cast<int>(program.size()))
 	{
-		programm[registers[6]]->execute(this);
+		program[registers[6]]->execute(this);
 		registers[6]++;
 	}
 

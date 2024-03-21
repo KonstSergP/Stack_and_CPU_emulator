@@ -271,7 +271,7 @@ namespace handMadeStack
             this->resize(capacity_*2 + 1);
         }
 
-        data_[size_] = element;
+        data_[size_] = std::move(element);
         size_++;
 
         ASSERT(this->good(), "Unable to push element\n");
